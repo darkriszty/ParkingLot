@@ -39,8 +39,8 @@ namespace ParkingLot.Controllers
         public async Task<IActionResult> GetAllTickets()
         {
             var tickets = await _ticketsRepository.GetCurrentTicketsAsync(Timeout);
-            return Ok(ApiResponse<TicketViewModel[]>.SuccessResult(
-                tickets.Select(_ => new TicketViewModel(_)).ToArray())
+            return Ok(ApiResponse<GetTicketResponse[]>.SuccessResult(
+                tickets.Select(_ => new GetTicketResponse(_)).ToArray())
             );
         }
 
@@ -58,14 +58,14 @@ namespace ParkingLot.Controllers
             return Ok(ApiResponse<PriceResponse>.SuccessResult(new PriceResponse(price)));
         }
 
-        private ApiResponse<TicketViewModel> MapTicketResponse(Ticket ticket)
+        private ApiResponse<GetTicketResponse> MapTicketResponse(Ticket ticket)
         {
             bool ticketCreated = ticket != Ticket.None;
-            return new ApiResponse<TicketViewModel>
+            return new ApiResponse<GetTicketResponse>
             {
                 Success = ticketCreated,
                 ErrorMessage = !ticketCreated ? "The parking lot is full." : null,
-                Response = new TicketViewModel(ticket)
+                Response = new GetTicketResponse(ticket)
             };
         }
 
