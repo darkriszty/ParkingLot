@@ -8,12 +8,12 @@ namespace ParkingLot.Dal
     public class TicketsRepository : ITicketsRepository
     {
         private const int MaxActiveTickets = 54; //TODO: make this configurable
-        private readonly TicketDbContext _dbContextFactory;
         private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
+        private readonly TicketDbContext _dbContext;
 
-        public TicketsRepository(TicketDbContext dbContextFactory)
+        public TicketsRepository(TicketDbContext dbContext)
         {
-            _dbContextFactory = dbContextFactory;
+            _dbContext = dbContext;
         }
 
         public async Task<Ticket> TryGenerateNewTicketAsync(CancellationToken cancellationToken)
@@ -27,8 +27,8 @@ namespace ParkingLot.Dal
 
                 var ticket = new Ticket();
 
-                await _dbContextFactory.Tickets.AddAsync(ticket, cancellationToken);
-                await _dbContextFactory.SaveChangesAsync(cancellationToken);
+                await _dbContext.Tickets.AddAsync(ticket, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
                 return ticket;
             }
@@ -40,7 +40,12 @@ namespace ParkingLot.Dal
 
         public async Task<bool> IsFullAsync(CancellationToken cancellationToken)
         {
-            return await _dbContextFactory.Tickets.CountAsync(cancellationToken) == MaxActiveTickets;
+            return await _dbContext.Tickets.CountAsync(cancellationToken) == MaxActiveTickets;
+        }
+
+        public Task<Ticket[]> GetCurrentTicketsAsync(CancellationToken timeout)
+        {
+            return _dbContext.Tickets.ToArrayAsync(timeout);
         }
     }
 }

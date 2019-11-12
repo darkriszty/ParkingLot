@@ -8,5 +8,6 @@ namespace ParkingLot.Dal
     {
         Task<Ticket> TryGenerateNewTicketAsync(CancellationToken cancellationToken);
         Task<bool> IsFullAsync(CancellationToken cancellationToken);
+        Task<Ticket[]> GetCurrentTicketsAsync(CancellationToken timeout);
     }
 }

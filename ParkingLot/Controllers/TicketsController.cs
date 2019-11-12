@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace ParkingLot.Controllers
 {
     [ApiController]
-    //[Route("/api/tickets")]
     [Route("api/tickets")]
     public class TicketsController : ControllerBase
     {
@@ -29,6 +28,13 @@ namespace ParkingLot.Controllers
             return !response.Success 
                 ? StatusCode((int)HttpStatusCode.Forbidden, response) 
                 : Ok(response);
+        }
+
+        [HttpGet]
+        [Route("")]
+        public async Task<IActionResult> GetTickets()
+        {
+            return Ok(await _ticketsRepository.GetCurrentTicketsAsync(Timeout));
         }
 
         private ApiResponse<TicketViewModel> MapTicketResponse(Ticket ticket)

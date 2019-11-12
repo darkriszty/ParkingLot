@@ -7,9 +7,11 @@ namespace ParkingLot.Models
         public Ticket()
         {
             Id = Guid.NewGuid();
+            IssueDate = DateTimeOffset.UtcNow;
         }
 
         public Guid Id { get; set; }
+        public DateTimeOffset IssueDate { get; set; }
 
         public static Ticket None => new Ticket {Id = Guid.Empty};
 
