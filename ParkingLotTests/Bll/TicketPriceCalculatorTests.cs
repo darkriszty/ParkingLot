@@ -103,6 +103,23 @@ namespace ParkingLotTests.Bll
             Assert.Pass();
         }
 
+        [Test]
+        public void GetPriceFor_PayedTicket_Costs0()
+        {
+            var ticket = new Ticket
+            {
+                IssueDate = DateTimeOffset.UtcNow.AddDays(-1),
+                PayedAmount = 2,
+                PaymentMethod = "test",
+                PayedAt = DateTimeOffset.UtcNow
+            };
+            var sut = CreateSut();
+
+            int price = sut.GetPriceFor(ticket);
+
+            Assert.That(price, Is.EqualTo(0));
+        }
+
         private TicketPriceCalculator CreateSut() => new TicketPriceCalculator();
     }
 }

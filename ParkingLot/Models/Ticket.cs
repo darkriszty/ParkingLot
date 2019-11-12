@@ -12,6 +12,9 @@ namespace ParkingLot.Models
 
         public Guid Id { get; set; }
         public DateTimeOffset IssueDate { get; set; }
+        public int PayedAmount { get; set; }
+        public string PaymentMethod { get; set; }
+        public DateTimeOffset PayedAt { get; set; }
 
         public static Ticket None => new Ticket {Id = Guid.Empty};
 

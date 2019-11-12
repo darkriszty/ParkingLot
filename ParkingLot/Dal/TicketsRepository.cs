@@ -53,5 +53,12 @@ namespace ParkingLot.Dal
         {
             return await _dbContext.Tickets.FirstOrDefaultAsync(t => t.Id == id, cancellationToken) ?? Ticket.None;
         }
+
+        public Task UpdateTicketAsync(Ticket ticket, CancellationToken cancellationToken)
+        {
+            _dbContext.Tickets.Add(ticket);
+            _dbContext.Entry(ticket).State = EntityState.Modified;
+            return _dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 }

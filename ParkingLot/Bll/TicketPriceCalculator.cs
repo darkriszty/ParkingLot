@@ -10,6 +10,9 @@ namespace ParkingLot.Bll
 
         public int GetPriceFor(Ticket ticket)
         {
+            if (ticket.PayedAmount > 0)
+                return 0;
+
             TimeSpan difference = DateTimeOffset.UtcNow - ticket.IssueDate;
 
             int hours = (int)Math.Floor(difference.TotalHours);

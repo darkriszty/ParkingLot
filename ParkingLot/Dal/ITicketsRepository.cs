@@ -11,5 +11,6 @@ namespace ParkingLot.Dal
         Task<bool> IsFullAsync(CancellationToken cancellationToken);
         Task<Ticket[]> GetCurrentTicketsAsync(CancellationToken cancellationToken);
         Task<Ticket> GetTicketByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task UpdateTicketAsync(Ticket ticket, CancellationToken cancellationToken);
     }
 }

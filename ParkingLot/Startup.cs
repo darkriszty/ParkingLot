@@ -27,6 +27,7 @@ namespace ParkingLot
                 options.UseSqlServer(Configuration.GetConnectionString("ParkingLotDatabase")));
             services.AddTransient<ITicketsRepository, TicketsRepository>();
             services.AddTransient<TicketPriceCalculator>();
+            services.AddTransient<TicketPaymentService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
