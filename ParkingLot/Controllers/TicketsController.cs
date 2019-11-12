@@ -1,20 +1,47 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using ParkingLot.Dal;
+using ParkingLot.Dtos;
+using ParkingLot.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ParkingLot.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    //[Route("/api/tickets")]
+    [Route("api/tickets")]
     public class TicketsController : ControllerBase
     {
-        private readonly ILogger<TicketsController> _logger;
+        private readonly ITicketsRepository _ticketsRepository;
 
-        public TicketsController(ILogger<TicketsController> logger)
+        public TicketsController(ITicketsRepository ticketsRepository)
         {
-            _logger = logger;
+            _ticketsRepository = ticketsRepository;
         }
+
+        [HttpPost]
+        [Route("")]
+        public async Task<IActionResult> EnterParkingLot()
+        {
+            var response = MapTicketResponse(await _ticketsRepository.TryGenerateNewTicketAsync(Timeout));
+            return !response.Success 
+                ? StatusCode((int)HttpStatusCode.Forbidden, response) 
+                : Ok(response);
+        }
+
+        private ApiResponse<TicketViewModel> MapTicketResponse(Ticket ticket)
+        {
+            bool ticketCreated = ticket != Ticket.None;
+            return new ApiResponse<TicketViewModel>
+            {
+                Success = ticketCreated,
+                ErrorMessage = !ticketCreated ? "The parking lot is full." : null,
+                Response = new TicketViewModel(ticket)
+            };
+        }
+
+        private CancellationToken Timeout => new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
     }
 }
