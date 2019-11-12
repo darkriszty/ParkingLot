@@ -1,9 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "C:\\Users\\krisztian.daroczi.LuminosLabs\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\krisztian.daroczi.LuminosLabs\\.nuget\\packages",
-      "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-    ]
-  }
-}

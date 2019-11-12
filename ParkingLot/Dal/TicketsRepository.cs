@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using ParkingLot.Models;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,9 +44,14 @@ namespace ParkingLot.Dal
             return await _dbContext.Tickets.CountAsync(cancellationToken) == MaxActiveTickets;
         }
 
-        public Task<Ticket[]> GetCurrentTicketsAsync(CancellationToken timeout)
+        public Task<Ticket[]> GetCurrentTicketsAsync(CancellationToken cancellationToken)
         {
-            return _dbContext.Tickets.ToArrayAsync(timeout);
+            return _dbContext.Tickets.ToArrayAsync(cancellationToken);
+        }
+
+        public async Task<Ticket> GetTicketByIdAsync(Guid id, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Tickets.FirstOrDefaultAsync(t => t.Id == id, cancellationToken) ?? Ticket.None;
         }
     }
 }

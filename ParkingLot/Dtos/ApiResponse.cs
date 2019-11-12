@@ -14,5 +14,10 @@
                 Success = false
             };
         }
+
+        public static ApiResponse<T> SuccessResult(T response)
+        {
+            return new ApiResponse<T> {Success = true, Response = response};
+        }
     }
 }

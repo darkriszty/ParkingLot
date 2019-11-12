@@ -8,6 +8,7 @@ namespace ParkingLot.Dtos
         {
             Id = ticket?.Id.ToString("N").ToUpper();
         }
-        public string Id { get; set; }
+
+        public string Id { get;  }
     }
 }

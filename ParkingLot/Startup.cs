@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ParkingLot.Bll;
 using ParkingLot.Dal;
 
 namespace ParkingLot
@@ -25,6 +26,7 @@ namespace ParkingLot
             services.AddDbContext<TicketDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("ParkingLotDatabase")));
             services.AddTransient<ITicketsRepository, TicketsRepository>();
+            services.AddTransient<TicketPriceCalculator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
