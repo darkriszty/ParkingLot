@@ -11,7 +11,7 @@ using ParkingLot.Bll;
 namespace ParkingLot.Controllers
 {
     [ApiController]
-    [Route("api/tickets")]
+    [Route("api")]
     public class TicketsController : ControllerBase
     {
         private readonly ITicketsRepository _ticketsRepository;
@@ -26,7 +26,7 @@ namespace ParkingLot.Controllers
         }
 
         [HttpPost]
-        [Route("")]
+        [Route("tickets")]
         public async Task<IActionResult> NewTicket()
         {
             var response = MapGetTicketResponse(await _ticketsRepository.TryGenerateNewTicketAsync(Timeout));
@@ -36,7 +36,7 @@ namespace ParkingLot.Controllers
         }
 
         [HttpGet]
-        [Route("")]
+        [Route("tickets")]
         public async Task<IActionResult> GetTicketsWithCars()
         {
             var tickets = await _ticketsRepository.GetCurrentTicketsAsync(Timeout);
@@ -44,7 +44,7 @@ namespace ParkingLot.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("tickets/{id}")]
         public async Task<IActionResult> GetTicketPrice(string id)
         {
             if (!Guid.TryParse(id, out var parsedTickedId))
@@ -59,7 +59,7 @@ namespace ParkingLot.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/payments")]
+        [Route("tickets/{id}/payments")]
         public async Task<IActionResult> Pay(string id, [FromBody]PaymentRequest paymentRequest)
         {
             if (paymentRequest == null)
@@ -79,7 +79,7 @@ namespace ParkingLot.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/state")]
+        [Route("tickets/{id}/state")]
         public async Task<IActionResult> State(string id)
         {
             if (!Guid.TryParse(id, out var parsedTickedId))
@@ -94,7 +94,7 @@ namespace ParkingLot.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/leave")]
+        [Route("tickets/{id}/leave")]
         public async Task<IActionResult> Leave(string id)
         {
             if (!Guid.TryParse(id, out var parsedTickedId))
@@ -113,6 +113,14 @@ namespace ParkingLot.Controllers
             await _ticketsRepository.MarkLeaveParking(ticket, Timeout);
 
             return Ok(ApiResponse<LeaveParkingResponse>.SuccessResult(new LeaveParkingResponse(ticket)));
+        }
+
+        [HttpGet]
+        [Route("free-spaces")]
+        public async Task<IActionResult> NumberOfFreeSpaces()
+        {
+            int freeSpaces = await _ticketsRepository.GetFreeSpacesAsync(Timeout);
+            return Ok(ApiResponse<FreeSpacesResponse>.SuccessResult(response: new FreeSpacesResponse(freeSpaces)));
         }
 
         private ApiResponse<GetTicketResponse> MapGetTicketResponse(Ticket ticket)

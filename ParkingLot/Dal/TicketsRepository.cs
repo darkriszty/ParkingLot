@@ -69,5 +69,11 @@ namespace ParkingLot.Dal
             _dbContext.Entry(ticket).State = EntityState.Modified;
             return _dbContext.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<int> GetFreeSpacesAsync(CancellationToken cancellationToken)
+        {
+            int occupiedCount = await _dbContext.Tickets.CountAsync(t => t.VehicleLeaveDate == null, cancellationToken);
+            return MaxActiveTickets - occupiedCount;
+        }
     }
 }
