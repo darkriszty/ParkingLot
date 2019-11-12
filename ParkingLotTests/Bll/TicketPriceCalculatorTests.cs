@@ -104,20 +104,54 @@ namespace ParkingLotTests.Bll
         }
 
         [Test]
-        public void GetPriceFor_PayedTicket_Costs0()
+        public void GetPriceFor_PayedTicket14MinutesAgo_Costs0()
         {
             var ticket = new Ticket
             {
-                IssueDate = DateTimeOffset.UtcNow.AddDays(-1),
+                IssueDate = DateTimeOffset.UtcNow.AddHours(-1),
                 PayedAmount = 2,
                 PaymentMethod = "test",
-                PayedAt = DateTimeOffset.UtcNow
+                PayedAt = DateTimeOffset.UtcNow.AddMinutes(-14)
             };
             var sut = CreateSut();
 
             int price = sut.GetPriceFor(ticket);
 
             Assert.That(price, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetPriceFor_PayedTicket15MinutesAgo_Costs2()
+        {
+            var ticket = new Ticket
+            {
+                IssueDate = DateTimeOffset.UtcNow.AddHours(-1),
+                PayedAmount = 2,
+                PaymentMethod = "test",
+                PayedAt = DateTimeOffset.UtcNow.AddMinutes(-15)
+            };
+            var sut = CreateSut();
+
+            int price = sut.GetPriceFor(ticket);
+
+            Assert.That(price, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void GetPriceFor_PayedTicket16MinutesAgo_Costs2()
+        {
+            var ticket = new Ticket
+            {
+                IssueDate = DateTimeOffset.UtcNow.AddHours(-1),
+                PayedAmount = 2,
+                PaymentMethod = "test",
+                PayedAt = DateTimeOffset.UtcNow.AddMinutes(-16)
+            };
+            var sut = CreateSut();
+
+            int price = sut.GetPriceFor(ticket);
+
+            Assert.That(price, Is.EqualTo(2));
         }
 
         private TicketPriceCalculator CreateSut() => new TicketPriceCalculator();

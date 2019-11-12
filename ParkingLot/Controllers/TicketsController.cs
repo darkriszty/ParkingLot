@@ -71,7 +71,7 @@ namespace ParkingLot.Controllers
                 return BadRequest(ApiResponse<PaymentResponse>.FailResponse("Missing payment method."));
 
             if (!Guid.TryParse(id, out var parsedTickedId))
-                return NotFound(ApiResponse<PaymentResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
+                return BadRequest(ApiResponse<PaymentResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
 
             Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
             if (ticket == Ticket.None)
@@ -79,6 +79,21 @@ namespace ParkingLot.Controllers
 
             Ticket payedTicket = await _ticketPaymentService.PayTicketAsync(ticket, paymentRequest, Timeout);
             return Ok(ApiResponse<PaymentResponse>.SuccessResult(new PaymentResponse(payedTicket)));
+        }
+
+        [HttpGet]
+        [Route("{id}/state")]
+        public async Task<IActionResult> State(string id)
+        {
+            if (!Guid.TryParse(id, out var parsedTickedId))
+                return BadRequest(ApiResponse<PaymentStateResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
+
+            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
+            if (ticket == Ticket.None)
+                return NotFound(ApiResponse<PaymentStateResponse>.FailResponse($"Ticket with id {id} was not found."));
+
+            int price = _ticketPriceCalculator.GetPriceFor(ticket);
+            return Ok(ApiResponse<PaymentStateResponse>.SuccessResult(response: new PaymentStateResponse(price)));
         }
 
         private ApiResponse<GetTicketResponse> MapGetTicketResponse(Ticket ticket)
