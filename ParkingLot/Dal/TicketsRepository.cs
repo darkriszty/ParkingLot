@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using ParkingLot.Models;
 using System.Threading;
@@ -41,12 +42,12 @@ namespace ParkingLot.Dal
 
         public async Task<bool> IsFullAsync(CancellationToken cancellationToken)
         {
-            return await _dbContext.Tickets.CountAsync(cancellationToken) == MaxActiveTickets;
+            return await _dbContext.Tickets.CountAsync(t => !t.VehicleLeaveDate.HasValue, cancellationToken) == MaxActiveTickets;
         }
 
         public Task<Ticket[]> GetCurrentTicketsAsync(CancellationToken cancellationToken)
         {
-            return _dbContext.Tickets.ToArrayAsync(cancellationToken);
+            return _dbContext.Tickets.Where(t => !t.VehicleLeaveDate.HasValue).ToArrayAsync(cancellationToken);
         }
 
         public async Task<Ticket> GetTicketByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -56,6 +57,14 @@ namespace ParkingLot.Dal
 
         public Task UpdateTicketAsync(Ticket ticket, CancellationToken cancellationToken)
         {
+            _dbContext.Tickets.Add(ticket);
+            _dbContext.Entry(ticket).State = EntityState.Modified;
+            return _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public Task MarkLeaveParking(Ticket ticket, CancellationToken cancellationToken)
+        {
+            ticket.VehicleLeaveDate = DateTimeOffset.UtcNow;
             _dbContext.Tickets.Add(ticket);
             _dbContext.Entry(ticket).State = EntityState.Modified;
             return _dbContext.SaveChangesAsync(cancellationToken);

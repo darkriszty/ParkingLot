@@ -8,7 +8,7 @@ namespace ParkingLot.Dtos
         {
             PaymentMethod = payedTicket.PaymentMethod;
             PayedAmount = $"${payedTicket.PayedAmount.ToString()}";
-            PayedAt = payedTicket.PayedAt.ToString("HH:mm:ss dd.MM.yyyy");
+            PayedAt = payedTicket.PayedAt?.ToString("HH:mm:ss dd.MM.yyyy");
         }
 
         public string PaymentMethod { get; set; }

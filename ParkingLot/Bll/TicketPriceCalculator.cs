@@ -26,7 +26,7 @@ namespace ParkingLot.Bll
         private static bool IsFullyPaid(Ticket ticket)
         {
             return ticket.PayedAmount > 0 &&
-                   Math.Round((DateTimeOffset.UtcNow - ticket.PayedAt).TotalMinutes) < MinutesToGetOutAfterPayment;
+                   Math.Round((DateTimeOffset.UtcNow - ticket.PayedAt)?.TotalMinutes ?? 0) < MinutesToGetOutAfterPayment;
         }
     }
 }

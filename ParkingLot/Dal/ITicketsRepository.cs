@@ -12,5 +12,6 @@ namespace ParkingLot.Dal
         Task<Ticket[]> GetCurrentTicketsAsync(CancellationToken cancellationToken);
         Task<Ticket> GetTicketByIdAsync(Guid id, CancellationToken cancellationToken);
         Task UpdateTicketAsync(Ticket ticket, CancellationToken cancellationToken);
+        Task MarkLeaveParking(Ticket ticket, CancellationToken cancellationToken);
     }
 }

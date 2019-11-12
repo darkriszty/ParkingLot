@@ -3,7 +3,6 @@ using ParkingLot.Dal;
 using ParkingLot.Dtos;
 using ParkingLot.Models;
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,12 +37,10 @@ namespace ParkingLot.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> GetAllTickets()
+        public async Task<IActionResult> GetTicketsWithCars()
         {
             var tickets = await _ticketsRepository.GetCurrentTicketsAsync(Timeout);
-            return Ok(ApiResponse<GetTicketResponse[]>.SuccessResult(
-                tickets.Select(_ => new GetTicketResponse(_)).ToArray())
-            );
+            return Ok(ApiResponse<Ticket[]>.SuccessResult(tickets));
         }
 
         [HttpGet]
@@ -94,6 +91,28 @@ namespace ParkingLot.Controllers
 
             int price = _ticketPriceCalculator.GetPriceFor(ticket);
             return Ok(ApiResponse<PaymentStateResponse>.SuccessResult(response: new PaymentStateResponse(price)));
+        }
+
+        [HttpPost]
+        [Route("{id}/leave")]
+        public async Task<IActionResult> Leave(string id)
+        {
+            if (!Guid.TryParse(id, out var parsedTickedId))
+                return BadRequest(ApiResponse<PaymentResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
+
+            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
+            if (ticket == Ticket.None)
+                return NotFound(ApiResponse<PaymentResponse>.FailResponse($"Ticket with id {id} was not found."));
+
+            int price = _ticketPriceCalculator.GetPriceFor(ticket);
+            if (price > 0)
+            {
+                return Unauthorized(ApiResponse<LeaveParkingResponse>.FailResponse($"Not possible to leave. For {id} an amount of ${price} must be paid."));
+            }
+
+            await _ticketsRepository.MarkLeaveParking(ticket, Timeout);
+
+            return Ok(ApiResponse<LeaveParkingResponse>.SuccessResult(new LeaveParkingResponse(ticket)));
         }
 
         private ApiResponse<GetTicketResponse> MapGetTicketResponse(Ticket ticket)
