@@ -28,7 +28,7 @@ namespace ParkingLot.Controllers
         [Route("")]
         public async Task<IActionResult> EnterParkingLot()
         {
-            var response = MapTicketResponse(await _ticketsRepository.TryGenerateNewTicketAsync(Timeout));
+            var response = MapGetTicketResponse(await _ticketsRepository.TryGenerateNewTicketAsync(Timeout));
             return !response.Success 
                 ? StatusCode((int)HttpStatusCode.Forbidden, response) 
                 : Ok(response);
@@ -54,11 +54,14 @@ namespace ParkingLot.Controllers
             }
 
             Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
+            if (ticket == Ticket.None)
+                return NotFound(ApiResponse<PriceResponse>.FailResponse($"Ticket with id {id} was not found."));
+
             int price = _ticketPriceCalculator.GetPriceFor(ticket);
             return Ok(ApiResponse<PriceResponse>.SuccessResult(new PriceResponse(price)));
         }
 
-        private ApiResponse<GetTicketResponse> MapTicketResponse(Ticket ticket)
+        private ApiResponse<GetTicketResponse> MapGetTicketResponse(Ticket ticket)
         {
             bool ticketCreated = ticket != Ticket.None;
             return new ApiResponse<GetTicketResponse>
