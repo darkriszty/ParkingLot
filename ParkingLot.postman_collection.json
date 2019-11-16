@@ -24,12 +24,10 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44319/api/tickets",
-					"protocol": "https",
+					"raw": "{{parking-url}}/api/tickets",
 					"host": [
-						"localhost"
+						"{{parking-url}}"
 					],
-					"port": "44319",
 					"path": [
 						"api",
 						"tickets"
@@ -44,12 +42,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44319/api/tickets",
-					"protocol": "https",
+					"raw": "{{parking-url}}/api/tickets",
 					"host": [
-						"localhost"
+						"{{parking-url}}"
 					],
-					"port": "44319",
 					"path": [
 						"api",
 						"tickets"
@@ -64,12 +60,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44319/api/tickets/{{parking-ticketId}}",
-					"protocol": "https",
+					"raw": "{{parking-url}}/api/tickets/{{parking-ticketId}}",
 					"host": [
-						"localhost"
+						"{{parking-url}}"
 					],
-					"port": "44319",
 					"path": [
 						"api",
 						"tickets",
@@ -101,12 +95,10 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:44319/api/tickets/{{parking-ticketId}}/payments",
-					"protocol": "https",
+					"raw": "{{parking-url}}/api/tickets/{{parking-ticketId}}/payments",
 					"host": [
-						"localhost"
+						"{{parking-url}}"
 					],
-					"port": "44319",
 					"path": [
 						"api",
 						"tickets",
@@ -123,12 +115,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44319/api/tickets/{{parking-ticketId}}/state",
-					"protocol": "https",
+					"raw": "{{parking-url}}/api/tickets/{{parking-ticketId}}/state",
 					"host": [
-						"localhost"
+						"{{parking-url}}"
 					],
-					"port": "44319",
 					"path": [
 						"api",
 						"tickets",
@@ -145,12 +135,10 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44319/api/tickets/{{parking-ticketId}}/leave",
-					"protocol": "https",
+					"raw": "{{parking-url}}/api/tickets/{{parking-ticketId}}/leave",
 					"host": [
-						"localhost"
+						"{{parking-url}}"
 					],
-					"port": "44319",
 					"path": [
 						"api",
 						"tickets",
@@ -167,12 +155,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:44319/api/free-spaces",
-					"protocol": "https",
+					"raw": "{{parking-url}}/api/free-spaces",
 					"host": [
-						"localhost"
+						"{{parking-url}}"
 					],
-					"port": "44319",
 					"path": [
 						"api",
 						"free-spaces"
