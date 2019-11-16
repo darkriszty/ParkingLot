@@ -10,7 +10,7 @@ using ParkingLot.Dal;
 namespace ParkingLot.Migrations
 {
     [DbContext(typeof(TicketDbContext))]
-    [Migration("20191112173908_AddDates")]
+    [Migration("20191112183908_AddDates")]
     partial class AddDates
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
