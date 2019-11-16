@@ -23,7 +23,7 @@ namespace ParkingLot.Bll
             int price = _ticketPriceCalculator.GetPriceFor(ticket);
             if (price > 0)
             {
-                ticket.PayedAmount += _ticketPriceCalculator.GetPriceFor(ticket);
+                ticket.PayedAmount += price;
                 ticket.PaymentMethod = paymentRequest.PaymentMethod;
                 ticket.PayedAt = DateTimeOffset.UtcNow;
                 await _ticketsRepository.UpdateTicketAsync(ticket, cancellationToken);
