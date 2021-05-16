@@ -29,7 +29,8 @@ namespace ParkingLot.Controllers
         [Route("tickets")]
         public async Task<IActionResult> NewTicket()
         {
-            var response = MapGetTicketResponse(await _ticketsRepository.TryGenerateNewTicketAsync(Timeout));
+            using var timeout = StandardTimeoutCts;
+            var response = MapGetTicketResponse(await _ticketsRepository.TryGenerateNewTicketAsync(timeout.Token));
             return !response.Success 
                 ? StatusCode((int)HttpStatusCode.Forbidden, response) 
                 : Ok(response);
@@ -39,7 +40,8 @@ namespace ParkingLot.Controllers
         [Route("tickets")]
         public async Task<IActionResult> GetTicketsWithCars()
         {
-            var tickets = await _ticketsRepository.GetCurrentTicketsAsync(Timeout);
+            using var timeout = StandardTimeoutCts;
+            var tickets = await _ticketsRepository.GetCurrentTicketsAsync(timeout.Token);
             return Ok(ApiResponse<Ticket[]>.SuccessResult(tickets));
         }
 
@@ -47,10 +49,11 @@ namespace ParkingLot.Controllers
         [Route("tickets/{id}")]
         public async Task<IActionResult> GetTicketPrice(string id)
         {
+            using var timeout = StandardTimeoutCts;
             if (!Guid.TryParse(id, out var parsedTickedId))
                 return BadRequest(ApiResponse<PriceResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
 
-            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
+            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, timeout.Token);
             if (ticket == Ticket.None)
                 return NotFound(ApiResponse<PriceResponse>.FailResponse($"Ticket with id {id} was not found."));
 
@@ -70,11 +73,13 @@ namespace ParkingLot.Controllers
             if (!Guid.TryParse(id, out var parsedTickedId))
                 return BadRequest(ApiResponse<PaymentResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
 
-            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
+            using var getTicketTimeout = StandardTimeoutCts;
+            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, getTicketTimeout.Token);
             if (ticket == Ticket.None)
                 return NotFound(ApiResponse<PaymentResponse>.FailResponse($"Ticket with id {id} was not found."));
 
-            Ticket payedTicket = await _ticketPaymentService.PayTicketAsync(ticket, paymentRequest, Timeout);
+            using var payTicketTimeout = StandardTimeoutCts;
+            Ticket payedTicket = await _ticketPaymentService.PayTicketAsync(ticket, paymentRequest, payTicketTimeout.Token);
             return Ok(ApiResponse<PaymentResponse>.SuccessResult(new PaymentResponse(payedTicket)));
         }
 
@@ -85,7 +90,8 @@ namespace ParkingLot.Controllers
             if (!Guid.TryParse(id, out var parsedTickedId))
                 return BadRequest(ApiResponse<PaymentStateResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
 
-            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
+            using var timeout = StandardTimeoutCts;
+            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, timeout.Token);
             if (ticket == Ticket.None)
                 return NotFound(ApiResponse<PaymentStateResponse>.FailResponse($"Ticket with id {id} was not found."));
 
@@ -100,7 +106,8 @@ namespace ParkingLot.Controllers
             if (!Guid.TryParse(id, out var parsedTickedId))
                 return BadRequest(ApiResponse<PaymentResponse>.FailResponse($"Invalid parking ticket ID: {id}"));
 
-            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, Timeout);
+            using var getTicketsTimeout = StandardTimeoutCts;
+            Ticket ticket = await _ticketsRepository.GetTicketByIdAsync(parsedTickedId, getTicketsTimeout.Token);
             if (ticket == Ticket.None)
                 return NotFound(ApiResponse<PaymentResponse>.FailResponse($"Ticket with id {id} was not found."));
 
@@ -110,7 +117,8 @@ namespace ParkingLot.Controllers
                 return Unauthorized(ApiResponse<LeaveParkingResponse>.FailResponse($"Not possible to leave. For {id} an amount of ${price} must be paid."));
             }
 
-            await _ticketsRepository.MarkLeaveParking(ticket, Timeout);
+            using var leaveParkingTimeout = StandardTimeoutCts;
+            await _ticketsRepository.MarkLeaveParking(ticket, leaveParkingTimeout.Token);
 
             return Ok(ApiResponse<LeaveParkingResponse>.SuccessResult(new LeaveParkingResponse(ticket)));
         }
@@ -119,7 +127,8 @@ namespace ParkingLot.Controllers
         [Route("free-spaces")]
         public async Task<IActionResult> NumberOfFreeSpaces()
         {
-            int freeSpaces = await _ticketsRepository.GetFreeSpacesAsync(Timeout);
+            using var timeout = StandardTimeoutCts;
+            int freeSpaces = await _ticketsRepository.GetFreeSpacesAsync(timeout.Token);
             return Ok(ApiResponse<FreeSpacesResponse>.SuccessResult(response: new FreeSpacesResponse(freeSpaces)));
         }
 
@@ -134,6 +143,6 @@ namespace ParkingLot.Controllers
             };
         }
 
-        private CancellationToken Timeout => new CancellationTokenSource(TimeSpan.FromSeconds(30)).Token;
+        private CancellationTokenSource StandardTimeoutCts => new CancellationTokenSource(TimeSpan.FromSeconds(30));
     }
 }
