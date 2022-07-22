@@ -23,13 +23,20 @@ namespace ParkingLot.Bll
             int price = _ticketPriceCalculator.GetPriceFor(ticket);
             if (price > 0)
             {
-                ticket.PayedAmount += price;
-                ticket.PaymentMethod = paymentRequest.PaymentMethod;
-                ticket.PayedAt = DateTimeOffset.UtcNow;
-                await _ticketsRepository.UpdateTicketAsync(ticket, cancellationToken);
+                var payedTicket = PayTicket(ticket, price, paymentRequest.PaymentMethod);
+                await _ticketsRepository.UpdateTicketAsync(payedTicket, cancellationToken);
+                return payedTicket;
             }
 
             return ticket;
         }
+
+        private static Ticket PayTicket(Ticket ticket, int price, string paymentMethod)
+            => ticket with
+               {
+                   PayedAmount = ticket.PayedAmount + price,
+                   PaymentMethod = paymentMethod,
+                   PayedAt = DateTimeOffset.UtcNow
+               };
     }
 }

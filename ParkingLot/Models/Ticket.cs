@@ -2,52 +2,20 @@
 
 namespace ParkingLot.Models
 {
-    public class Ticket
+    public record Ticket
     {
-        public Ticket()
-        {
-            Id = Guid.NewGuid();
-            IssueDate = DateTimeOffset.UtcNow;
-        }
+        public Guid Id { get; private init; } = Guid.NewGuid();
 
-        public Guid Id { get; set; }
-        public DateTimeOffset IssueDate { get; set; }
+        public DateTimeOffset IssueDate { get; init; } = DateTimeOffset.UtcNow;
 
-        public int PayedAmount { get; set; }
-        public string PaymentMethod { get; set; }
-        public DateTimeOffset? PayedAt { get; set; }
+        public int PayedAmount { get; init; }
 
-        public DateTimeOffset? VehicleLeaveDate { get; set; }
-        public bool HasVehicleLeft => VehicleLeaveDate != null;
+        public string PaymentMethod { get; init; }
 
-        public static Ticket None => new Ticket {Id = Guid.Empty};
+        public DateTimeOffset? PayedAt { get; init; }
 
-        protected bool Equals(Ticket other)
-        {
-            return Id.Equals(other.Id);
-        }
+        public DateTimeOffset? VehicleLeaveDate { get; init; }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Ticket)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
-
-        public static bool operator ==(Ticket left, Ticket right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(Ticket left, Ticket right)
-        {
-            return !Equals(left, right);
-        }
+        public static Ticket None => new() {Id = Guid.Empty};
     }
 }
