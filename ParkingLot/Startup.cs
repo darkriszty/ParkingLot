@@ -11,32 +11,29 @@ namespace ParkingLot
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddControllers();
 
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+
             services.AddDbContext<TicketDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("ParkingLotDatabase")));
+                options.UseSqlServer(configuration.GetConnectionString("ParkingLotDatabase")));
             services.AddTransient<ITicketsRepository, TicketsRepository>();
             services.AddTransient<TicketPriceCalculator>();
             services.AddTransient<TicketPaymentService>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
@@ -48,20 +45,23 @@ namespace ParkingLot
             {
                 endpoints.MapControllers();
             });
+
+            app.UseSwaggerUI(options =>
+                             {
+                                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                                 options.RoutePrefix = string.Empty;
+                             });
+
             UpdateDatabase(app);
         }
 
         private static void UpdateDatabase(IApplicationBuilder app)
         {
-            using (var serviceScope = app.ApplicationServices
-                .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                using (var context = serviceScope.ServiceProvider.GetService<TicketDbContext>())
-                {
-                    context.Database.Migrate();
-                }
-            }
+            using var serviceScope = app.ApplicationServices
+                                        .GetRequiredService<IServiceScopeFactory>()
+                                        .CreateScope();
+            using var context = serviceScope.ServiceProvider.GetRequiredService<TicketDbContext>();
+            context.Database.Migrate();
         }
     }
 }
